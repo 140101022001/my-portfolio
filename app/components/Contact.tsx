@@ -1,32 +1,52 @@
 "use client"
 
-import { ChangeEvent, useState } from "react"
+import { zodResolver } from "@hookform/resolvers/zod"
+import axios from "axios"
+import { useForm } from "react-hook-form"
+import { z } from "zod"
 
-type TForm = {
-    name: string,
-    phone: string,
-    message: string
-}
-
-const initialForm = {
-    name: "",
-    phone: "",
-    message: ""
-}
-
+const formSchema = z.object({
+    name: z.string().min(1, {
+        message: "Name is required!",
+    }),
+    phone: z.string().min(9, {
+        message: "Please enter valid phone number!"
+    }),
+    message: z.string().min(1, {
+        message: "Message is required!"
+    }),
+})
 const Contact = () => {
-    const [form, setForm] = useState<TForm>(initialForm);
+    const {
+        register,
+        handleSubmit,
+        reset,
+        formState: { errors }
+    } = useForm<z.infer<typeof formSchema>>({
+        resolver: zodResolver(formSchema),
+        defaultValues: {
+            name: "",
+            phone: "",
+            message: ""
+        },
+    })
 
-    const handleChangeData = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-        const { name, value } = e.target;
-        setForm(prevForm => ({
-            ...prevForm,
-            [name]: value
-        }));
+    async function onSubmit(values: z.infer<typeof formSchema>) {
+        try {
+            const res = await axios.post('/api/mail', values);
+            if (res.data.status == 200) {
+                window.alert('Thanks for contact me!')
+                reset()
+            } else {
+                window.alert('Some thing error, please resend!')
+            }
+        } catch (error) {
+            console.log(error);
+        }
     }
 
     return (
-        <div className="w-full pt-[120px]" id="contact">
+        <section className="w-full pt-[120px]" id="contact">
             <div className="px-12 lg:px-40">
                 <div className="pb-8 text-center">
                     <h1 className="text-[3rem] font-bold inline w-max border-b-4 border-green-600">Contact</h1>
@@ -54,24 +74,27 @@ const Contact = () => {
                     </div>
                     <div className="flex-1 py-10">
                         <div className="border-2 border-gray-400 w-[70%] mx-auto my-10 lg:hidden" />
-                        <div className="grid w-full lg:w-[80%] mx-auto gap-3">
+                        <form className="grid w-full lg:w-[80%] mx-auto gap-3" onSubmit={handleSubmit(onSubmit)}>
                             <div className="w-full">
-                                <input type="text" className="border-2 border-gray-400 p-3 bg-transparent w-full rounded-md" placeholder="Name" name="name" value={form.name} onChange={handleChangeData}/>
+                                <input type="text" className="border-2 border-gray-400 p-3 bg-transparent w-full rounded-md" placeholder="Name" {...register("name", { required: true})} />
+                                {errors && errors?.name && <span className="text-red-700">{errors.name.message}</span>}
                             </div>
                             <div className="w-full">
-                                <input type="text" className="border-2 border-gray-400 p-3 bg-transparent w-full rounded-md" placeholder="Phone" name="phone" value={form.phone} onChange={handleChangeData}/>
+                                <input type="text" className="border-2 border-gray-400 p-3 bg-transparent w-full rounded-md" placeholder="Phone" {...register("phone", { required: true})} />
+                                {errors && errors?.phone && <span className="text-red-700">{errors.phone.message}</span>}
                             </div>
                             <div className="w-full">
-                                <textarea className="h-[300px] border-2 border-gray-400 p-3 bg-transparent w-full rounded-md" placeholder="Message" name="message" value={form.message} onChange={handleChangeData}/>
+                                <textarea className="h-[300px] border-2 border-gray-400 p-3 bg-transparent w-full rounded-md" placeholder="Message" {...register("message", { required: true})} />
+                                {errors && errors?.message && <span className="text-red-700">{errors.message.message}</span>}
                             </div>
                             <div className="w-full">
-                                <button className="w-full py-2 px-5 bg-blue-400 rounded-md" onClick={() => setForm(initialForm)}>Submit</button>
+                                <button className="w-full py-2 px-5 bg-blue-400 rounded-md">Submit</button>
                             </div>
-                        </div>
+                        </form>
                     </div>
                 </div>
             </div>
-        </div>
+        </section>
     )
 }
 
