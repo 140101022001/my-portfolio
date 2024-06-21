@@ -29,11 +29,12 @@ export async function POST(request: NextRequest) {
     });
     
     try {
-        const templatePath = path.join(__dirname + '../../../../app/index.html');
+        const templatePath = path.join(__dirname + '../../../../../../email/index.html');
         console.log(templatePath);
         
         
-        // const htmlTemplate = await readFileAsync('index.html', 'utf-8');
+        const htmlTemplate = await readFileAsync('index.html', 'utf-8');
+
         // const template = hbs.compile(htmlTemplate);
 
         // const htmlWithNoStyles = template({ name, phone, message })
@@ -50,7 +51,7 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({
             status: 200,
             message: "Success: email was sent",
-            templatePath: templatePath
+            templatePath: {htmlTemplate, templatePath}
         });
     } catch (error) {
         console.log(error);
