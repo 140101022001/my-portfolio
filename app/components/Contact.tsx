@@ -2,8 +2,10 @@
 
 import { zodResolver } from "@hookform/resolvers/zod"
 import axios from "axios"
+import { useTransition } from "react"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
+import { Loader2 } from 'lucide-react';
 
 const formSchema = z.object({
     name: z.string().min(1, {
@@ -30,19 +32,22 @@ const Contact = () => {
             message: ""
         },
     })
+    const [isFetching, transition] = useTransition()
 
-    async function onSubmit(values: z.infer<typeof formSchema>) {
-        try {
-            const res = await axios.post('/api/mail', values);
-            if (res.data.status == 200) {
-                window.alert('Thanks for contact me!')
-                reset()
-            } else {
-                window.alert('Some thing error, please resend!')
+    function onSubmit(values: z.infer<typeof formSchema>) {
+        transition(async () => {
+            try {
+                const res = await axios.post('/api/mail', values);
+                if (res.data.status == 200) {
+                    window.alert('Thanks for contact me!')
+                    reset()
+                } else {
+                    window.alert('Some thing error, please resend!')
+                }
+            } catch (error) {
+                console.log(error);
             }
-        } catch (error) {
-            console.log(error);
-        }
+        })
     }
 
     return (
@@ -88,7 +93,7 @@ const Contact = () => {
                                 {errors && errors?.message && <span className="text-red-700">{errors.message.message}</span>}
                             </div>
                             <div className="w-full">
-                                <button className="w-full py-2 px-5 bg-blue-400 rounded-md">Submit</button>
+                                <button className={`w-full flex justify-center items-center py-2 px-5 bg-blue-400 rounded-md ${isFetching ? 'bg-blue-400/80 cursor-not-allowed' : ''}`} disabled={isFetching}><span>{isFetching ? <Loader2 className="w-5 h-5 animate-spin"/>: 'Submit'}</span></button>
                             </div>
                         </form>
                     </div>
