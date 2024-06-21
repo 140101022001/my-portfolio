@@ -29,7 +29,7 @@ export async function POST(request: NextRequest) {
     });
     
     try {
-        const templatePath = path.join('app/index.html');
+        const templatePath = path.join(__dirname + '../../../../app/index.html');
         console.log(templatePath);
         
         
