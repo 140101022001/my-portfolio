@@ -4,6 +4,7 @@ import fs from 'fs'
 import { promisify } from 'util'
 import hbs from 'handlebars';
 import juice from 'juice';
+import path from 'path';
 
 const readFileAsync = promisify(fs.readFile);
 
@@ -28,23 +29,28 @@ export async function POST(request: NextRequest) {
     });
     
     try {
-        const htmlTemplate = await readFileAsync('index.html', 'utf-8');
-        const template = hbs.compile(htmlTemplate);
+        const templatePath = path.resolve('index.html');
+        console.log(templatePath);
+        
+        
+        // const htmlTemplate = await readFileAsync('index.html', 'utf-8');
+        // const template = hbs.compile(htmlTemplate);
 
-        const htmlWithNoStyles = template({ name, phone, message })
-        const html = juice(htmlWithNoStyles);
+        // const htmlWithNoStyles = template({ name, phone, message })
+        // const html = juice(htmlWithNoStyles);
 
-        const mail = await transporter.sendMail({
-            from: username,
-            to: "hung.work1401@gmail.com",
-            replyTo: username,
-            subject: `Có thằng nào hỏi kìa`,
-            html,
-        });
+        // const mail = await transporter.sendMail({
+        //     from: username,
+        //     to: "hung.work1401@gmail.com",
+        //     replyTo: username,
+        //     subject: `Có thằng nào hỏi kìa`,
+        //     html,
+        // });
 
         return NextResponse.json({
             status: 200,
             message: "Success: email was sent",
+            templatePath: templatePath
         });
     } catch (error) {
         console.log(error);
