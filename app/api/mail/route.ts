@@ -33,7 +33,7 @@ export async function POST(request: NextRequest) {
         console.log(templatePath);
         
         
-        const htmlTemplate = await readFileAsync('index.html', 'utf-8');
+        // const htmlTemplate = await readFileAsync('index.html', 'utf-8');
 
         // const template = hbs.compile(htmlTemplate);
 
@@ -51,7 +51,7 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({
             status: 200,
             message: "Success: email was sent",
-            templatePath: {htmlTemplate, templatePath}
+            templatePath: { templatePath}
         });
     } catch (error) {
         console.log(error);
